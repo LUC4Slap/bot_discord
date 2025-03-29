@@ -24,6 +24,8 @@ General commands:
 {self.bot.command_prefix}prefix - alterar prefixo de comando
 {self.bot.command_prefix}remove - remove a última música da fila
 {self.bot.command_prefix}wiki - faz uma busca na wikipidia - ex: [!wiki brasil]
+{self.bot.command_prefix}clima - faz uma busca do clime em uma cidade
+{self.bot.command_prefix}dolar - traz a cotação atual do dolar
             ```
             """
 
