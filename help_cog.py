@@ -26,6 +26,8 @@ General commands:
 {self.bot.command_prefix}wiki - faz uma busca na wikipidia - ex: [!wiki brasil]
 {self.bot.command_prefix}clima - faz uma busca do clime em uma cidade
 {self.bot.command_prefix}dolar - traz a cotação atual do dolar
+{self.bot.command_prefix}filmes - traz os top 10 filmes do imdb
+{self.bot.command_prefix}pesquisa_filme - permite fazer uma busca de um filme no imdb
             ```
             """
 

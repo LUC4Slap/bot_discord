@@ -2,10 +2,17 @@ import discord
 from discord.ext import commands
 import wikipedia
 import requests
+import os
 
 class search_cog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.token_imdb = os.getenv("TOKEN_IMDB")
+        self.linkImagem = "https://image.tmdb.org/t/p/w300_and_h450_bestv2"
+        self.idioma = "pt-br"
+        self.url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={self.token_imdb}&language={self.idioma}"
+        self.url_pesquisa = f"https://api.themoviedb.org/3/search/movie?api_key={self.token_imdb}"
+
 
     @commands.command(name="wiki", help="pesquise alguma coisa na wikipidia")
     async def wiki(self, ctx: commands.Context, *, pesquisa):
@@ -98,3 +105,55 @@ class search_cog(commands.Cog):
 
         except Exception as e:
             await ctx.send("❌ Erro ao buscar a cotação. Tente novamente mais tarde.")
+
+    @commands.command(name="filmes", help="retorna uma lista de filmes")
+    async def filmes(self, ctx: commands.Context):
+        try:
+            data = requests.get(self.url).json()
+            lista_resultados = data["results"]
+
+            for filme in lista_resultados:
+                await ctx.reply(f"""
+                Nome: {filme["title"]}
+                Sinopse: {filme["overview"]}
+                Nota: {filme["vote_average"]}⭐
+                {self.linkImagem+"/"+filme["poster_path"]}
+                """)
+            # await ctx.reply("buscado")
+        except Exception as error:
+            await ctx.reply(error)
+
+    @commands.command(name="pesquisa_filme", help="pesquisa um filme por nome")
+    async def pesquisa_filme(self, ctx: commands.Context, *,nome_filme):
+        try:
+            # print(self.url + f"&query={nome_filme}")
+            data = requests.get(self.url_pesquisa + f"&query={nome_filme}").json()
+            lista_resultados = data["results"]
+
+            for filme in lista_resultados:
+                if filme:
+                    await ctx.reply(f"""
+                    Nome: {filme["title"]}
+                    Sinopse: {filme["overview"]}
+                    Nota: {filme["vote_average"]}⭐
+                    {self.linkImagem + "/" + filme["poster_path"]}
+                """)
+                    filme_id = filme["id"]
+                    for tr in self.retorna_lista_trailes(filme_id):
+                        await ctx.send(f"https://www.youtube.com/embed/{tr['key']}")
+                else:
+                    await ctx.reply(f"Sem resultado para a pesquisa: {nome_filme}")
+
+            # await ctx.reply(nome_filme)
+        except Exception as error:
+            await ctx.reply(error)
+
+    def retorna_lista_trailes(self, filme_id):
+        try:
+            url_trailer = f"https://api.themoviedb.org/3/movie/{filme_id}/videos?api_key={self.token_imdb}&language={self.idioma}"
+            trailers_json = requests.get(url_trailer).json()
+            data_tr = trailers_json["results"]
+            return data_tr
+        except Exception as erro:
+            print(erro)
+            return [];
